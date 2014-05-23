@@ -1,0 +1,9 @@
+{
+  "name": "exif-rename",
+  "description": "Renames images based on EXIF information."
+  "dependencies": {
+    "kew": "^0.4.0",
+    "moment": "^2.6.0",
+    "exif": "^0.4.0"
+  }
+}
