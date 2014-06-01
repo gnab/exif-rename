@@ -86,7 +86,10 @@ function renameFile (imagePath) {
         });
       }
       else {
-        deferred.resolve(filename);
+        deferred.resolve({
+          type: 'success',
+          message: filename
+        });
       }
     });
 
@@ -95,9 +98,19 @@ function renameFile (imagePath) {
 }
 
 function reportStatus(imagePath) {
-  return function (filename) {
-    console.log('Successfully renamed ' + imagePath + ':');
-    console.log(filename);
+  return function (status) {
+    if (status.type === 'error') {
+      console.error('Error while renaming ' + imagePath + ':');
+      console.error(status.message);
+    }
+    else if (status.type === 'ignore') {
+      console.log('Ignoring file ' + imagePath + ':');
+      console.log(status.message);
+    }
+    else if (status.type === 'success') {
+      console.log('Successfully renamed ' + imagePath + ':');
+      console.log(status.message);
+    }
   }
 }
 
@@ -113,14 +126,5 @@ paths
       .then(assertNonExistingFile)
       .then(renameFile(imagePath))
       .then(reportStatus(imagePath))
-      .fail(function (status) {
-        if (status.type === 'error') {
-          console.error('Error while renaming ' + imagePath + ':');
-          console.error(status.message);
-        }
-        else if (status.type === 'ignore') {
-          console.log('Ignoring file ' + imagePath + ':');
-          console.log(status.message);
-        }
-      });
+      .fail(reportStatus(imagePath));
   });
