@@ -48,11 +48,18 @@ function skipCorrectlyNamesImage (imagePath) {
 }
 
 function assertNonExistingFile (filename) {
-  if (fs.existsSync(path)) {
-    return Q.reject('DUPL ' + filename);
-  }
+  var deferred = Q.defer();
 
-  return filename;
+  fs.exists(filename, function (exists) {
+    if (exists) {
+      deferred.reject('DUPL ' + filename);
+    }
+    else {
+      deferred.resolve(filename);
+    }
+  });
+
+  return deferred.promise;
 }
 
 function renameFile (imagePath) {
