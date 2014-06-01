@@ -13,12 +13,18 @@ function readImageExif (path) {
         deferred.resolve(data);
       }
       else {
-        deferred.reject(error);
+        deferred.reject({
+          type: 'error',
+          message: error
+        });
       }
     });
   }
   catch (error) {
-    deferred.reject(error);
+    deferred.reject({
+      type: 'error',
+      message: error
+    });
   }
 
   return deferred.promise;
@@ -40,7 +46,10 @@ function createFilenameFromDate (imagePath) {
 function skipCorrectlyNamesImage (imagePath) {
   return function (filename) {
     if (imagePath.toLowerCase() === filename.toLowerCase()) {
-      return Q.reject('SKIP ' + imagePath);
+      return Q.reject({
+        type: 'ignore',
+        message: 'Filename is in correct format.'
+      });
     }
 
     return filename;
@@ -52,7 +61,10 @@ function assertNonExistingFile (filename) {
 
   fs.exists(filename, function (exists) {
     if (exists) {
-      deferred.reject('DUPL ' + filename);
+      deferred.reject({
+        type: 'ignore',
+        message: 'Target ' + filename + ' already exists.'
+      });
     }
     else {
       deferred.resolve(filename);
@@ -83,7 +95,14 @@ paths
       .then(skipCorrectlyNamesImage(imagePath))
       .then(assertNonExistingFile)
       .then(renameFile(imagePath))
-      .fail(function (error) {
-        console.log(error);
+      .fail(function (status) {
+        if (status.type === 'error') {
+          console.error('Error while renaming ' + imagePath + ':');
+          console.error(status.message);
+        }
+        else if (status.type === 'ignore') {
+          console.log('Ignoring file ' + imagePath + ':');
+          console.log(status.message);
+        }
       });
   });
