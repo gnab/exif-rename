@@ -43,7 +43,7 @@ function createFilenameFromDate (imagePath) {
   };
 }
 
-function skipCorrectlyNamesImage (imagePath) {
+function skipCorrectlyNamedImage (imagePath) {
   return function (filename) {
     if (imagePath.toLowerCase() === filename.toLowerCase()) {
       return Q.reject({
@@ -122,7 +122,7 @@ paths
     readImageExif(path.normalize(imagePath))
       .then(getExifCreateDate)
       .then(createFilenameFromDate(imagePath))
-      .then(skipCorrectlyNamesImage(imagePath))
+      .then(skipCorrectlyNamedImage(imagePath))
       .then(assertNonExistingFile)
       .then(renameFile(imagePath))
       .then(reportStatus(imagePath))
