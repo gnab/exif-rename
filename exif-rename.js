@@ -77,10 +77,14 @@ function assertNonExistingFile (filename) {
 function renameFile (imagePath) {
   return function (filename) {
     fs.renameSync(imagePath, filename);
-
-    console.log('MOVE ' + filename);
-
     return filename;
+  }
+}
+
+function reportStatus(imagePath) {
+  return function (filename) {
+    console.log('Successfully renamed ' + imagePath + ':');
+    console.log(filename);
   }
 }
 
@@ -95,6 +99,7 @@ paths
       .then(skipCorrectlyNamesImage(imagePath))
       .then(assertNonExistingFile)
       .then(renameFile(imagePath))
+      .then(reportStatus(imagePath))
       .fail(function (status) {
         if (status.type === 'error') {
           console.error('Error while renaming ' + imagePath + ':');
