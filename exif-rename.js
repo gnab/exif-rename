@@ -76,8 +76,21 @@ function assertNonExistingFile (filename) {
 
 function renameFile (imagePath) {
   return function (filename) {
-    fs.renameSync(imagePath, filename);
-    return filename;
+    var deferred = Q.defer();
+
+    fs.rename(imagePath, filename, function (error) {
+      if (error) {
+        deferred.reject({
+          type: 'error',
+          message: error
+        });
+      }
+      else {
+        deferred.resolve(filename);
+      }
+    });
+
+    return deferred.promise;
   }
 }
 
